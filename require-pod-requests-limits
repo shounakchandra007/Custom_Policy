@@ -1,0 +1,32 @@
+---
+metadata:
+  name: "require-pod-requests-limits"
+  annotations:
+    policies.kyverno.io/category: "Best Practices"
+    policies.kyverno.io/description: "As application workloads share cluster resources,\
+      \ it is important to limit resources  requested and consumed by each pod. It\
+      \ is recommended to require 'resources.requests'  and 'resources.limits' per\
+      \ pod. If a namespace level request or limit is specified,  defaults will automatically\
+      \ be applied to each pod based on the 'LimitRange'  configuration."
+    policies.kyverno.io/title: "Require pod requests and limits"
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+spec:
+  validationFailureAction: "audit"
+  rules:
+  - match:
+      resources:
+        kinds:
+        - "Pod"
+    name: "validate-resources"
+    validate:
+      pattern:
+        spec:
+          containers:
+          - resources:
+              requests:
+                memory: "?*"
+                cpu: "?*"
+              limits:
+                memory: "?*"
+      message: "CPU and memory resource requests and limits are required"
